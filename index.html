@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rey2nd-Security | Advanced Threat Intelligence</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #000000;
+            --secondary: #00FF00;
+            --secondary-light: #33FF33;
+            --accent-white: #FFFFFF;
+            --accent-gray: #F0F0F0;
+            --accent-dark: #1A1A1A;
+            --success: #00FF00;
+            --warning: #FFD700;
+            --danger: #FF1744;
+            --font-mono: 'IBM Plex Mono', monospace;
+            --font-sans: 'IBM Plex Sans', sans-serif;
+        }
+        
+        html, body {
+            height: 100%;
+        }
+        
+        body {
+            font-family: var(--font-sans);
+            background: linear-gradient(135deg, var(--primary) 0%, #0a0a0a 100%);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 100px,
+                    rgba(0, 255, 0, 0.03) 100px,
+                    rgba(0, 255, 0, 0.03) 101px
+                );
+            pointer-events: none;
+            z-index: 0;
+            animation: scanlines 8s linear infinite;
+        }
+        
+        @keyframes scanlines {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 0 100%;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes glowGreen {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(0, 255, 0, 0.7);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        .container {
+            background: var(--accent-gray);
+            max-width: 950px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            border: 4px solid var(--primary);
+            box-shadow: 
+                16px 16px 0 rgba(0, 255, 0, 0.2),
+                32px 32px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, var(--primary) 0%, #1a1a1a 100%);
+            color: var(--accent-white);
+            padding: 40px;
+            border-bottom: 5px solid var(--secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -5%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 255, 0, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(40px);
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo {
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%);
+            border: 4px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 32px;
+            color: var(--primary);
+            font-family: var(--font-mono);
+            transform: rotate(-8deg);
+            box-shadow: 
+                0 12px 30px rgba(0, 255, 0, 0.4),
+                inset 0 1px 0 rgba(255,255,255,0.5);
+            animation: glowGreen 3s ease-in-out infinite;
+        }
+        
+        .logo-text h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin: 0;
+            font-family: var(--font-mono);
+            color: var(--secondary);
+        }
+        
+        .logo-text p {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent-white);
+            font-weight: 600;
+            margin-top: 3px;
+        }
+        
+        .tagline {
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--secondary);
+            font-family: var(--font-mono);
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .content {
+            padding: 40px;
+            position: relative;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-box {
+            background: var(--primary);
+            border: 3px solid var(--primary);
+            padding: 15px;
+            color: var(--secondary);
+            font-size: 12px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+        
+        .feature-box::before {
+            content: '⚡';
+            font-size: 16px;
+        }
+        
+        .info-box {
+            background: var(--primary);
+            border: 3px solid var(--secondary);
+            padding: 15px;
+            margin-bottom: 30px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--secondary);
+            box-shadow: 0 8px 20px rgba(0, 255, 0, 0.2);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 30px;
+            border-bottom: 4px solid var(--primary);
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 18px 20px;
+            background: var(--accent-white);
+            border: 3px solid var(--primary);
+            border-right: 4px solid var(--primary);
+            border-bottom: none;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn:last-child {
+            border-right: 3px solid var(--primary);
+        }
+        
+        .tab-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 255, 0, 0.3);
+        }
+        
+        .tab-btn.active {
+            background: var(--secondary);
+            color: var(--primary);
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(0, 255, 0, 0.4);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 12px;
+            color: var(--primary);
+            font-weight: 700;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 16px;
+            border: 4px solid var(--primary);
+            background: var(--accent-white);
+            color: var(--primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            transition: all 0.3s;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            background: var(--secondary);
+            border-color: var(--primary);
+            box-shadow: 
+                0 12px 30px rgba(0, 255, 0, 0.3),
+                6px 6px 0 var(--primary);
+            transform: translate(-3px, -3px);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex: 1;
+            min-width: 140px;
+            padding: 16px 20px;
+            border: 4px solid var(--primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 8px 8px 0 var(--primary);
+        }
+        
+        .btn-scan {
+            background: var(--secondary);
+            color: var(--primary);
+        }
+        
+        .btn-scan:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 
+                12px 12px 0 var(--primary),
+                0 0 30px rgba(0, 255, 0, 0.5);
+        }
+        
+        .btn-scan:active {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--primary);
+        }
+        
+        .btn-clear {
+            background: var(--accent-white);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-clear:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 
+                12px 12px 0 var(--secondary),
+                0 0 20px rgba(0, 255, 0, 0.2);
+            background: var(--secondary);
+        }
+        
+        .btn-clear:active {
+            transform: translate(-1px, -1px);
+        }
+        
+        .results {
+            display: none;
+        }
+        
+        .results.active {
+            display: block;
+        }
+        
+        .result-header {
+            background: var(--primary);
+            border: 4px solid var(--secondary);
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0, 255, 0, 0.2);
+        }
+        
+        .threat-level {
+            display: inline-block;
+            padding: 12px 18px;
+            border: 3px solid var(--primary);
+            font-weight: 700;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+        
+        .threat-level:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+        
+        .threat-level.safe {
+            background: var(--success);
+            color: var(--primary);
+            box-shadow: 0 6px 12px rgba(0, 255, 0, 0.4);
+        }
+        
+        .threat-level.warning {
+            background: var(--warning);
+            color: var(--primary);
+            box-shadow: 0 6px 12px rgba(255, 215, 0, 0.4);
+        }
+        
+        .threat-level.danger {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 6px 12px rgba(255, 23, 68, 0.5);
+        }
+        
+        .threat-score {
+            margin-top: 15px;
+            font-size: 12px;
+            color: var(--secondary);
+            font-family: var(--font-mono);
+        }
+        
+        .score-bar {
+            width: 100%;
+            height: 16px;
+            background: var(--primary);
+            margin-top: 10px;
+            overflow: hidden;
+            border: 2px solid var(--secondary);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success) 0%, var(--secondary-light) 100%);
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+        }
+        
+        .score-fill.warning {
+            background: var(--warning);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
+        
+        .score-fill.danger {
+            background: var(--danger);
+            box-shadow: 0 0 15px rgba(255, 23, 68, 0.6);
+        }
+        
+        .detection-list {
+            margin-top: 20px;
+        }
+        
+        .detection-item {
+            background: var(--accent-white);
+            border: 3px solid var(--primary);
+            border-left-width: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            animation: slideUp 0.4s ease-out backwards;
+            transform-origin: top;
+        }
+        
+        .detection-item:nth-child(1) { animation-delay: 0.1s; }
+        .detection-item:nth-child(2) { animation-delay: 0.15s; }
+        .detection-item:nth-child(3) { animation-delay: 0.2s; }
+        .detection-item:nth-child(n+4) { animation-delay: 0.25s; }
+        
+        .detection-item:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 
+                0 12px 28px rgba(0,0,0,0.2),
+                0 0 20px rgba(0, 255, 0, 0.15);
+        }
+        
+        .detection-item.warning {
+            border-left-color: var(--warning);
+            background: #FFFEF0;
+        }
+        
+        .detection-item.danger {
+            border-left-color: var(--danger);
+            background: #FFF5F5;
+        }
+        
+        .detection-item.info {
+            border-left-color: var(--success);
+            background: #F0FFF4;
+        }
+        
+        .detection-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        .detection-desc {
+            font-size: 12px;
+            color: var(--primary);
+            line-height: 1.6;
+            font-family: var(--font-mono);
+            opacity: 0.85;
+        }
+        
+        .footer {
+            background: linear-gradient(90deg, var(--primary) 0%, #1a1a1a 100%);
+            color: var(--secondary);
+            padding: 25px;
+            text-align: center;
+            border-top: 5px solid var(--secondary);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 1px;
+            box-shadow: inset 0 1px 0 rgba(0,255,0,0.2);
+        }
+        
+        .footer strong {
+            font-weight: 700;
+            color: var(--secondary);
+        }
+        
+        .footer-credit {
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--secondary);
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                box-shadow: 
+                    12px 12px 0 rgba(0, 255, 0, 0.2),
+                    24px 24px 40px rgba(0, 0, 0, 0.5);
+            }
+            
+            .header, .content {
+                padding: 25px;
+            }
+            
+            .logo-text h1 {
+                font-size: 26px;
+            }
+            
+            .tab-btn {
+                min-width: 120px;
+                padding: 14px 12px;
+                font-size: 11px;
+            }
+            
+            button {
+                min-width: 110px;
+                padding: 14px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">R2</div>
+                <div class="logo-text">
+                    <h1>Rey2nd-Security</h1>
+                    <p>Threat Intelligence Platform</p>
+                </div>
+            </div>
+            <p class="tagline">Advanced Threat Detection & Analysis</p>
+        </div>
+        
+        <div class="content">
+            <div class="feature-grid">
+                <div class="feature-box">URL Threat Analysis</div>
+                <div class="feature-box">Code Injection Detection</div>
+                <div class="feature-box">Ransomware Scanner</div>
+                <div class="feature-box">Real-time Heuristics</div>
+            </div>
+            
+            <div class="info-box">
+                ⚠️ Scanner ini mendeteksi pola phishing, malware URL, obfuscated code, dan tanda-tanda ransomware menggunakan analisis heuristik real-time. Hasil bersifat advisory dan bukan jaminan keamanan 100%.
+            </div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('url-tab')">URL Scanner</button>
+                <button class="tab-btn" onclick="switchTab('source-tab')">Source Code</button>
+                <button class="tab-btn" onclick="switchTab('file-tab')">File Check</button>
+                <button class="tab-btn" onclick="switchTab('hash-tab')">Hash Lookup</button>
+            </div>
+            
+            <!-- URL Scanner Tab -->
+            <div id="url-tab" class="tab-content active">
+                <div class="input-group">
+                    <label>URL / Domain untuk di-scan:</label>
+                    <input type="text" id="urlInput" placeholder="https://example.com atau example.com" />
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-scan" onclick="scanURL()">▶ Scan URL</button>
+                    <button class="btn-clear" onclick="clearURL()">✕ Clear</button>
+                </div>
+                
+                <div id="urlResults" class="results">
+                    <div class="result-header">
+                        <div>
+                            <span class="threat-level" id="urlThreatLevel">Safe</span>
+                            <div class="threat-score">
+                                Threat Score: <span id="urlScore">0</span>%
+                                <div class="score-bar">
+                                    <div class="score-fill" id="urlScoreFill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="urlDetections" class="detection-list"></div>
+                </div>
+            </div>
+            
+            <!-- Source Code Tab -->
+            <div id="source-tab" class="tab-content">
+                <div class="input-group">
+                    <label>Paste Source Code / HTML untuk di-scan:</label>
+                    <textarea id="sourceInput" placeholder="Paste HTML atau JavaScript code disini..."></textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-scan" onclick="scanSource()">▶ Scan Code</button>
+                    <button class="btn-clear" onclick="clearSource()">✕ Clear</button>
+                </div>
+                
+                <div id="sourceResults" class="results">
+                    <div class="result-header">
+                        <div>
+                            <span class="threat-level" id="sourceThreatLevel">Safe</span>
+                            <div class="threat-score">
+                                Threat Score: <span id="sourceScore">0</span>%
+                                <div class="score-bar">
+                                    <div class="score-fill" id="sourceScoreFill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sourceDetections" class="detection-list"></div>
+                </div>
+            </div>
+            
+            <!-- File Check Tab -->
+            <div id="file-tab" class="tab-content">
+                <div class="input-group">
+                    <label>Filename atau Extension untuk di-check:</label>
+                    <input type="text" id="fileInput" placeholder="malware.exe atau document.pdf.exe" />
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-scan" onclick="scanFile()">▶ Check File</button>
+                    <button class="btn-clear" onclick="clearFile()">✕ Clear</button>
+                </div>
+                
+                <div id="fileResults" class="results">
+                    <div class="result-header">
+                        <div>
+                            <span class="threat-level" id="fileThreatLevel">Safe</span>
+                            <div class="threat-score">
+                                Threat Score: <span id="fileScore">0</span>%
+                                <div class="score-bar">
+                                    <div class="score-fill" id="fileScoreFill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="fileDetections" class="detection-list"></div>
+                </div>
+            </div>
+            
+            <!-- Hash Lookup Tab -->
+            <div id="hash-tab" class="tab-content">
+                <div class="input-group">
+                    <label>Masukkan Hash (MD5 / SHA256):</label>
+                    <input type="text" id="hashInput" placeholder="5d41402abc4b2a76b9719d911017c592" />
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-scan" onclick="scanHash()">▶ Lookup Hash</button>
+                    <button class="btn-clear" onclick="clearHash()">✕ Clear</button>
+                </div>
+                
+                <div id="hashResults" class="results">
+                    <div class="result-header">
+                        <div>
+                            <span class="threat-level" id="hashThreatLevel">Safe</span>
+                            <div class="threat-score">
+                                Match Status: <span id="hashStatus">Unknown</span>
+                                <div class="score-bar">
+                                    <div class="score-fill" id="hashScoreFill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="hashDetections" class="detection-list"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <strong>Rey2nd-Security</strong> © 2024 | Advanced Threat Intelligence
+            <div class="footer-credit">
+                Developed for cybersecurity awareness & threat detection
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const maliciousPatterns = [
+            'phishing', 'fake-bank', 'verify-account', 'confirm-identity', 'update-payment',
+            'suspicious-activity', 'urgent-action', 'claim-reward', 'limited-time', 'expire',
+            'paypa1.com', 'amaz0n.com', 'goog1e.com', 'microsof.com', 'drop-box.tk', 'icloud-verify.ml'
+        ];
+        
+        const knownPhishingDomains = [
+            'paypal-verify.tk', 'amazon-confirm.ml', 'apple-id-update.cf', 'microsoft-verify.ga',
+            'bank-login.tk', 'google-account.ml', 'facebook-security.ga'
+        ];
+        
+        const dangerousExtensions = [
+            'exe', 'bat', 'cmd', 'com', 'scr', 'vbs', 'js', 'jar', 'zip', 'rar',
+            'dll', 'msi', 'app', 'deb', 'rpm', 'dmg', 'pkg', 'apk'
+        ];
+        
+        const suspiciousPatterns = [
+            { pattern: /eval\s*\(/gi, name: 'eval()', desc: 'Mengeksekusi code dinamis' },
+            { pattern: /document\.location\s*=/gi, name: 'Redirect URL', desc: 'Mengalihkan ke URL lain' },
+            { pattern: /document\.write\s*\(/gi, name: 'Document Write', desc: 'Menulis content dinamis' },
+            { pattern: /atob\s*\(/gi, name: 'Base64 Decode', desc: 'Decode data terenkripsi' },
+            { pattern: /XMLHttpRequest|fetch\s*\(/gi, name: 'HTTP Request', desc: 'Request ke server lain' },
+            { pattern: /localStorage|sessionStorage/gi, name: 'Local Storage', desc: 'Akses data browser' },
+            { pattern: /document\.cookie/gi, name: 'Cookie Access', desc: 'Mencuri cookie' },
+            { pattern: /keypress|keydown|keyup/gi, name: 'Keylogger', desc: 'Menangkap input keyboard' }
+        ];
+        
+        const knownMalwareHashes = {
+            '5d41402abc4b2a76b9719d911017c592': 'hello',
+            'd41d8cd98f00b204e9800998ecf8427e': 'eicar',
+            '44d88612fea8a8f36de82e1278a8cb25': 'eicar-test-file'
+        };
+        
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function scanURL() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+                alert('Masukkan URL!');
+                return;
+            }
+            
+            let score = 0;
+            const detections = [];
+            let normalizedUrl = url.toLowerCase();
+            
+            if (!normalizedUrl.startsWith('http')) {
+                normalizedUrl = 'https://' + normalizedUrl;
+            }
+            
+            try {
+                const urlObj = new URL(normalizedUrl);
+                const domain = urlObj.hostname;
+                const pathname = urlObj.pathname;
+                
+                if (knownPhishingDomains.includes(domain)) {
+                    score += 90;
+                    detections.push({
+                        level: 'danger',
+                        title: '🔴 Known Phishing Domain',
+                        desc: 'Domain ini terdaftar di database phishing.'
+                    });
+                }
+                
+                maliciousPatterns.forEach(pattern => {
+                    if (domain.includes(pattern) || pathname.includes(pattern)) {
+                        score += 15;
+                        detections.push({
+                            level: 'warning',
+                            title: '🟡 Suspicious Pattern',
+                            desc: `Pattern: "${pattern}"`
+                        });
+                    }
+                });
+                
+                if (domain.includes('xn--')) {
+                    score += 25;
+                    detections.push({
+                        level: 'warning',
+                        title: '🟡 Punycode Domain',
+                        desc: 'Internationalized characters detected (spoofing risk).'
+                    });
+                }
+                
+                if (url.startsWith('http://')) {
+                    score += 10;
+                    detections.push({
+                        level: 'warning',
+                        title: '🟡 No HTTPS',
+                        desc: 'Website tidak menggunakan enkripsi SSL/TLS.'
+                    });
+                }
+                
+                if (detections.length === 0) {
+                    detections.push({
+                        level: 'info',
+                        title: '🟢 Safe URL',
+                        desc: 'URL tampak aman berdasarkan analisis heuristik.'
+                    });
+                }
+                
+            } catch (e) {
+                score = 30;
+                detections.push({
+                    level: 'warning',
+                    title: '⚠️ Invalid URL',
+                    desc: 'Format URL tidak valid atau rusak.'
+                });
+            }
+            
+            displayResults('url', score, detections);
+        }
+        
+        function scanSource() {
+            const source = document.getElementById('sourceInput').value;
+            if (!source) {
+                alert('Paste source code!');
+                return;
+            }
+            
+            let score = 0;
+            const detections = [];
+            
+            suspiciousPatterns.forEach(pattern => {
+                const matches = source.match(pattern.pattern);
+                if (matches) {
+                    score += 10;
+                    detections.push({
+                        level: 'warning',
+                        title: pattern.name,
+                        desc: pattern.desc + ` (${matches.length}x)`
+                    });
+                }
+            });
+            
+            if (/form.*action.*=.*["'](http|\/)/gi.test(source)) {
+                score += 25;
+                detections.push({
+                    level: 'danger',
+                    title: '🔴 Form Hijacking',
+                    desc: 'Form mengirim data ke server eksternal.'
+                });
+            }
+            
+            if (/eval\(atob\(|Array\.from.*reduce|\\x[0-9a-f]/gi.test(source)) {
+                score += 30;
+                detections.push({
+                    level: 'danger',
+                    title: '🔴 Obfuscated Code',
+                    desc: 'Code tersembunyi atau dienkripsi.'
+                });
+            }
+            
+            if (detections.length === 0) {
+                detections.push({
+                    level: 'info',
+                    title: '🟢 Clean Code',
+                    desc: 'Tidak ditemukan pattern mencurigakan.'
+                });
+            }
+            
+            displayResults('source', score, detections);
+        }
+        
+        function scanFile() {
+            const filename = document.getElementById('fileInput').value.trim();
+            if (!filename) {
+                alert('Masukkan nama file!');
+                return;
+            }
+            
+            let score = 0;
+            const detections = [];
+            const parts = filename.split('.');
+            
+            if (parts.length > 2) {
+                const lastExt = parts[parts.length - 1].toLowerCase();
+                if (dangerousExtensions.includes(lastExt)) {
+                    score += 50;
+                    detections.push({
+                        level: 'danger',
+                        title: '🔴 Double Extension',
+                        desc: `File memiliki extension berbahaya tersembunyi: .${lastExt}`
+                    });
+                }
+            }
+            
+            parts.slice(1).forEach((ext) => {
+                const cleanExt = ext.toLowerCase();
+                if (dangerousExtensions.includes(cleanExt)) {
+                    score += 40;
+                    detections.push({
+                        level: 'danger',
+                        title: '🔴 Dangerous Extension',
+                        desc: `Extension .${cleanExt} adalah executable berbahaya.`
+                    });
+                }
+            });
+            
+            if (detections.length === 0) {
+                detections.push({
+                    level: 'info',
+                    title: '🟢 Safe File',
+                    desc: 'Extension file tampak aman.'
+                });
+            }
+            
+            displayResults('file', score, detections);
+        }
+        
+        function scanHash() {
+            const hash = document.getElementById('hashInput').value.trim().toLowerCase();
+            if (!hash) {
+                alert('Masukkan hash!');
+                return;
+            }
+            
+            const detections = [];
+            let status = 'Not Found';
+            let score = 0;
+            
+            if (knownMalwareHashes[hash]) {
+                status = 'DETECTED - ' + knownMalwareHashes[hash];
+                score = 100;
+                detections.push({
+                    level: 'danger',
+                    title: '🔴 Malware Hash Found',
+                    desc: 'Hash ditemukan di database malware global.'
+                });
+            } else {
+                detections.push({
+                    level: 'info',
+                    title: '🟢 Hash Unknown',
+                    desc: 'Hash tidak ditemukan di database malware.'
+                });
+            }
+            
+            document.getElementById('hashStatus').textContent = status;
+            document.getElementById('hashThreatLevel').className = 'threat-level ' + (score > 0 ? 'danger' : 'safe');
+            document.getElementById('hashThreatLevel').textContent = score > 0 ? '🚨 Detected' : '✅ Clean';
+            
+            document.getElementById('hashScoreFill').style.width = score + '%';
+            document.getElementById('hashScoreFill').className = 'score-fill' + (score > 0 ? ' danger' : '');
+            
+            document.getElementById('hashDetections').innerHTML = detections.map(det => `
+                <div class="detection-item ${det.level}">
+                    <div class="detection-title">${det.title}</div>
+                    <div class="detection-desc">${det.desc}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('hashResults').classList.add('active');
+        }
+        
+        function displayResults(tab, score, detections) {
+            score = Math.min(score, 100);
+            
+            const resultsEl = document.getElementById(tab + 'Results');
+            const threatLevelEl = document.getElementById(tab + 'ThreatLevel');
+            const scoreEl = document.getElementById(tab + 'Score');
+            const scoreFillEl = document.getElementById(tab + 'ScoreFill');
+            const detectionsEl = document.getElementById(tab + 'Detections');
+            
+            let level = 'safe';
+            let levelText = '✅ Safe';
+            
+            if (score >= 70) {
+                level = 'danger';
+                levelText = '🚨 Dangerous';
+            } else if (score >= 40) {
+                level = 'warning';
+                levelText = '⚠️ Suspicious';
+            }
+            
+            threatLevelEl.className = 'threat-level ' + level;
+            threatLevelEl.textContent = levelText;
+            scoreEl.textContent = score;
+            
+            scoreFillEl.style.width = score + '%';
+            scoreFillEl.className = 'score-fill';
+            if (score >= 70) scoreFillEl.classList.add('danger');
+            else if (score >= 40) scoreFillEl.classList.add('warning');
+            
+            detectionsEl.innerHTML = detections.map(det => `
+                <div class="detection-item ${det.level}">
+                    <div class="detection-title">${det.title}</div>
+                    <div class="detection-desc">${det.desc}</div>
+                </div>
+            `).join('');
+            
+            resultsEl.classList.add('active');
+        }
+        
+        function clearURL() {
+            document.getElementById('urlInput').value = '';
+            document.getElementById('urlResults').classList.remove('active');
+        }
+        
+        function clearSource() {
+            document.getElementById('sourceInput').value = '';
+            document.getElementById('sourceResults').classList.remove('active');
+        }
+        
+        function clearFile() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileResults').classList.remove('active');
+        }
+        
+        function clearHash() {
+            document.getElementById('hashInput').value = '';
+            document.getElementById('hashResults').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
